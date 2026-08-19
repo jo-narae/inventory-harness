@@ -14,6 +14,20 @@
 
 완료 여부는 AI의 설명이 아니라 **실행 가능한 검증 결과**가 판단한다.
 
+검증은 별도의 두 명령으로 분리하지 않는다.
+
+```text
+공통 규칙 검증
++
+Issue별 종료 조건을 기계화한 테스트
+        ↓
+npm run verify 하나에 누적
+```
+
+Issue별 테스트는 해당 Issue가 끝난 뒤에도 삭제하지 않고 회귀 테스트로 남긴다.
+
+CI는 별도의 심판이 아니라, **로컬에서 통과한 `npm run verify` 전체가 독립된 환경에서도 동일하게 통과하는지 확인하는 재현성 게이트**다.
+
 ---
 
 # 1. 이번 실습에서 검증하려는 것
@@ -219,6 +233,11 @@ Build
 - [ ] 실행 가능한 조건 2
 - [ ] 실행 가능한 조건 3
 
+## 기계 검증
+- 기계적으로 판정 가능한 종료 조건은 Issue별 테스트로 만든다.
+- 파일명: `tests/issues/issue-{번호}-{기능}.test.ts`
+- 예: `tests/issues/issue-23-dispose.test.ts`
+
 ## 건드리면 안 되는 것
 필요한 경우 추가한다.
 
@@ -276,6 +295,70 @@ next build
 
 라고 설명하더라도 `npm run verify`가 실패하면 작업은 아직 끝난 것이 아니다.
 
+## 6.1 Issue별 종료 조건도 `verify`에 편입한다
+
+H1에서 모든 미래 Issue의 심판을 미리 만들 수는 없다.
+
+H1에서는 Type Check, Lint, Architecture Check, 기존 Domain Test, Build처럼 **모든 Issue에 공통으로 적용할 검증 기반**을 만든다.
+
+이후 실제 Issue가 들어오면 기계적으로 판정 가능한 종료 조건을 테스트로 추가한다.
+
+예:
+
+```text
+Issue #23 — 만료 재고 폐기
+        ↓
+tests/issues/issue-23-dispose.test.ts
+
+Issue #24 — Movement 취소
+        ↓
+tests/issues/issue-24-reverse-movement.test.ts
+
+Issue #25 — Settings
+        ↓
+tests/issues/issue-25-settings.test.ts
+```
+
+파일명 규칙은 다음과 같다.
+
+```text
+tests/issues/issue-{Issue 번호}-{기능명}.test.ts
+```
+
+Issue 번호를 파일명에 포함하는 이유는 **어떤 유지보수 계약에서 이 검증이 생겼는지 추적하기 위해서**다.
+
+Issue가 Merge된 뒤에도 해당 테스트는 삭제하지 않는다.
+
+```text
+Issue #23 Merge
+↓
+issue-23-dispose.test.ts 유지
+
+Issue #24 작업
+↓
+기존 issue-23-dispose.test.ts
++
+신규 issue-24-reverse-movement.test.ts
+↓
+둘 다 npm run verify에서 실행
+```
+
+즉 `npm run verify`는 시간이 지날수록 다음을 함께 판정한다.
+
+```text
+공통 규칙
++
+기존 기능
++
+과거 Issue에서 추가된 종료 조건
++
+현재 Issue에서 추가된 종료 조건
+```
+
+별도의 `npm run verify:issue` 명령은 두지 않는다.
+
+**Issue별 검증을 기존 테스트 스위트에 누적해 `npm run verify` 하나로 로컬과 CI가 동일한 전체 판정을 실행하도록 한다.**
+
 ---
 
 # 7. 로컬과 CI는 같은 심판을 사용한다
@@ -297,7 +380,9 @@ npm run verify
 
 두 번째 검증은 새로운 기준으로 다시 채점하기 위한 것이 아니다.
 
-**AI가 작업한 로컬 환경에서 통과한 결과가 깨끗한 GitHub 환경에서도 동일하게 재현되는지 확인하기 위한 것이다.**
+Issue별 종료 조건 테스트까지 포함해 **AI가 작업한 로컬 환경에서 통과한 전체 판정이 깨끗한 GitHub 환경에서도 동일하게 재현되는지 확인하기 위한 것이다.**
+
+예를 들어 Issue #23에서 `tests/issues/issue-23-dispose.test.ts`가 추가됐다면, 이 파일은 `vitest run`의 대상에 포함되고 `npm run verify`를 통해 로컬과 CI 양쪽에서 실행된다.
 
 따라서 로컬과 CI가 사용하는 심판은 같다.
 
@@ -1072,9 +1157,9 @@ CI Failure Cause: 테스트 DB 초기화 과정 누락
 | 단계 | 목표 | 주요 산출물 |
 |---|---|---|
 | H0 | SSOT 정책 수립 | 기준 문서 정의, 문서 역할·충돌·변경 규칙 |
-| H1 | 심판 구축 | `npm run verify`, Architecture Check, 보호 경로 검사, 테스트 DB 준비 과정, GitHub Actions |
-| H2 | 계약서 | 유지보수 Issue Template |
-| H3 | 구현 루프 | Issue → SSOT 확인 → 구현 → verify → 재시도 |
+| H1 | 공통 심판 기반 구축 | `npm run verify`, Architecture Check, 보호 경로 검사, 테스트 DB 준비 과정, GitHub Actions |
+| H2 | 계약서 | 유지보수 Issue Template + Issue별 테스트 명명 규칙 |
+| H3 | 구현 루프 | Issue → SSOT 확인 → 종료 조건 기계화 → 구현 → verify → 재시도 |
 | H4 | PR 게이트 | PR → 독립 CI 재검증 → AI Review → 사람 승인 |
 | H5 | 실전 검증 | 실제 유지보수 Issue 투입 + 실험 로그 |
 
@@ -1123,6 +1208,7 @@ H0~H5에서 만드는 것 중 **문서는 두 개뿐**이고, 나머지는 실�
 | H1 | 테스트 DB 초기화 | `scripts/verify/reset-db.ts` | 코드 · **보호** |
 | H1 | CI | `.github/workflows/verify.yml` | 설정 · **보호** |
 | H2 | Issue 템플릿 | `.github/ISSUE_TEMPLATE/maintenance.yml` | 설정 |
+| H2/H3 | Issue별 종료 조건 테스트 | `tests/issues/issue-{번호}-{기능}.test.ts` | 코드 · Merge 후 회귀 테스트로 유지 |
 | H3 | 구현 루프 | `.claude/skills/harness-loop/` | 스킬 |
 | H4 | PR 게이트 | `.claude/skills/harness-ship/` | 스킬 |
 | H5 | 실험 로그 | `docs/harness/01-log.md` | 문서 · 수정 허용 |
@@ -1375,7 +1461,7 @@ NEEDS_HUMAN
 
 ---
 
-# 24. H1 — 심판 구축
+# 24. H1 — 공통 심판 기반 구축
 
 주요 산출물:
 
@@ -1394,7 +1480,24 @@ Schema / Migration 적용 과정
 
 ```
 
-목표는 로컬과 CI에서 같은 검증을 재현하는 것이다.
+목표는 모든 Issue에 공통으로 적용되는 검증 기반을 먼저 만들고, 이후 Issue별 종료 조건 테스트가 같은 `npm run verify`에 자연스럽게 누적될 수 있게 하는 것이다.
+
+H1에서는 아직 미래 Issue가 없으므로 Issue별 테스트를 미리 만들지 않는다.
+
+```text
+H1
+→ 공통 검증 기반 구축
+
+H2
+→ Issue 종료 조건 작성 규칙 확정
+
+H3 이후 실제 Issue 처리
+→ 기계화 가능한 종료 조건을
+  tests/issues/issue-{번호}-{기능}.test.ts 로 추가
+→ npm run verify에 자동 포함
+```
+
+CI 역시 별도의 Issue 검증 명령을 갖지 않는다. 같은 `npm run verify`를 실행함으로써 **현재 Issue를 포함해 지금까지 누적된 모든 기계 검증을 독립 환경에서 다시 확인한다.**
 
 ```
 Local
@@ -1426,14 +1529,30 @@ npm run verify
 
 필수 항목:
 
-```
+```text
 배경
 변경할 내용
 종료 조건
 건드리면 안 되는 영역
 구현 루프 최대 횟수
-
 ```
+
+기계적으로 판정 가능한 종료 조건은 실제 Issue 처리 단계에서 테스트로 만든다.
+
+명명 규칙:
+
+```text
+tests/issues/issue-{Issue 번호}-{기능명}.test.ts
+```
+
+예:
+
+```text
+Issue #23 → tests/issues/issue-23-dispose.test.ts
+Issue #24 → tests/issues/issue-24-reverse-movement.test.ts
+```
+
+이 테스트는 해당 Issue만을 위한 일회성 검사가 아니라 Merge 후에도 남는 회귀 테스트다.
 
 ---
 
@@ -1454,6 +1573,8 @@ npm run verify
 → 관련 SSOT 확인
 → Issue와 SSOT 충돌 검사
 → 종료 조건 확인
+→ 기계 판정 가능 / 사람 판정 필요 조건 분리
+→ 기계 판정 가능한 종료 조건을 Issue별 테스트로 추가
 → 계획
 → 브랜치 생성
 → 구현
@@ -1603,7 +1724,7 @@ PR 이후 CI · AI Review · 사람 반려 때문에 구현 단계로 돌아가�
 | 실패 원인 분석      | 실패 로그를 다음 수정에 제대로 반영했는가            |
 | 회귀 방지         | 새 기능 때문에 기존 기능을 깨뜨렸는가              |
 | 보호 경로 변경      | 금지된 테스트나 심판을 수정하려 했는가              |
-| CI 재현성        | 로컬 PASS가 새로 만든 CI 환경에서도 PASS했는가    |
+| CI 재현성        | 공통 규칙 + 누적된 Issue 종료 조건 테스트가 새 CI 환경에서도 동일하게 PASS했는가 |
 | 테스트 DB 재현성    | 로컬과 CI 모두 빈 상태에서 테스트 DB를 준비할 수 있는가 |
 | AI Review     | 기계 검증에서 잡지 못한 문제가 발견됐는가            |
 | 사람 호출 시점      | 해결할 수 없을 때 제대로 멈췄는가                |
@@ -1790,7 +1911,9 @@ CI, AI Review, 사람의 최종 검토 반려 때문에 구현 단계로 복귀�
 
 ### 13. CI는 두 번째 심판이 아니다
 
-로컬과 동일한 `npm run verify`를 깨끗한 GitHub 환경에서 다시 실행해 **결과가 재현되는지 확인한다.**
+로컬과 동일한 `npm run verify`를 깨끗한 GitHub 환경에서 다시 실행해 **전체 판정이 재현되는지 확인한다.**
+
+이때 `verify`에는 공통 규칙뿐 아니라 지금까지 Issue를 통해 추가된 종료 조건 테스트도 포함된다.
 
 ### 14. 마지막 판단은 사람이 한다
 
