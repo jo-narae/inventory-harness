@@ -158,14 +158,31 @@ tests/**invariant**
 허용되는 것:
 
 ```text
-docs/harness/01-log.md        실험 기록
-새 테스트 파일                 예: tests/dispose.test.ts
-새 migration                   기존 migration 수정은 금지
+docs/harness/01-log.md                         실험 기록
+tests/issues/issue-{현재 번호}-*.test.ts        이번 Issue의 종료 조건
+새 migration                                    기존 migration 수정은 금지
 ```
 
-> **이 목록의 원본은 H1 이후 `scripts/verify/protected.ts`로 옮긴다.**  
-> 그 시점부터 여기에는 목록을 두지 않고 그 파일을 가리킨다.  
+### Issue별 테스트는 자기 것만 쓴다
+
+종료 조건 테스트는 Merge 후에도 회귀 테스트로 남는다.
+그래서 **과거 Issue의 테스트는 현재 작업에서 고칠 수 없다.**
+
+```text
+Issue #24 작업 중
+
+tests/issues/issue-24-*.test.ts   쓰기 허용   ← 이번 계약의 종료 조건
+tests/issues/issue-23-*.test.ts   변경 금지   ← 지난 계약이 지키던 것
+```
+
+막지 않으면 #24를 통과시키려고 #23의 조건을 느슨하게 만들 수 있고,
+그 순간 누적 회귀 방지가 무너진다.
+
+현재 Issue 번호는 **브랜치명에서 읽는다** (`23-expiry-dispose` → 23).
+
+> **이 목록의 실행 원본은 `scripts/verify/protected.ts`다.**
 > 지시가 아니라 **Git 변경 내역으로 판정**하며, 위반 시 `verify`가 실패한다.
+> 기준선은 `main`이고, `main`에서는 검사하지 않는다 — 기준을 세우는 것은 사람의 일이다.
 
 ---
 

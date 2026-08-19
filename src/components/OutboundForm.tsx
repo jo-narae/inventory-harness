@@ -10,7 +10,7 @@ import { ExpiryBadge } from './StatusBadge'
 import { Qty } from './Qty'
 import { saveOutbound } from '@/actions/outbound'
 import { ALLOCATION_REASON, planFefo } from '@/lib/fefo'
-import { formatDate, humanizeRemaining } from '@/lib/date'
+import { dateOnly, formatDate, humanizeRemaining } from '@/lib/date'
 import { expiryStatus } from '@/lib/expiry'
 import { OUTBOUND_REASONS, REASON_LABEL, type ReasonCode } from '@/lib/constants'
 
@@ -48,7 +48,7 @@ export function OutboundForm({
     () =>
       lots
         .filter((l) => l.productId === product?.id && l.locationId === Number(locationId))
-        .map((l) => ({ ...l, expiryDate: new Date(l.expiry) })),
+        .map((l) => ({ ...l, expiryDate: dateOnly(l.expiry) })),
     [lots, product, locationId]
   )
   const stock = myLots.reduce((s, l) => s + l.quantity, 0)

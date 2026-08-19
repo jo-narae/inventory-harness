@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { BulkInputRow } from './BulkInputRow'
 import { shipOutPopup } from '@/actions/popup'
 import { ALLOCATION, planAllocation } from '@/lib/fefo'
-import { formatDate } from '@/lib/date'
+import { dateOnly, formatDate } from '@/lib/date'
 
 export type ShipRow = {
   productId: number
@@ -54,7 +54,7 @@ export function PopupShipOut({
       rows.map((row) => {
         const qty = Number(values[row.productId] ?? '') || 0
         const { plan, shortage } = planAllocation(
-          row.lots.map((l) => ({ id: l.id, expiryDate: new Date(l.expiry), quantity: l.quantity })),
+          row.lots.map((l) => ({ id: l.id, expiryDate: dateOnly(l.expiry), quantity: l.quantity })),
           qty,
           ALLOCATION.FEFO
         )

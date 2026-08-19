@@ -16,6 +16,11 @@ export function addDays(base: Date, days: number): Date {
   return dateOnly(d)
 }
 
+/** 그 날로부터 지난 일수. 발송 경과일처럼 '얼마나 됐나'에 쓴다 */
+export function daysSince(d: Date): number {
+  return -daysUntil(d)
+}
+
 /** 오늘 기준 남은 일수. 음수면 이미 지난 것 */
 export function daysUntil(target: Date): number {
   const MS = 86_400_000

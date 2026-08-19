@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { BulkInputRow } from './BulkInputRow'
 import { saveFulfillmentReflection } from '@/actions/fulfillment'
 import { ALLOCATION, planAllocation } from '@/lib/fefo'
-import { formatDate } from '@/lib/date'
+import { dateOnly, formatDate } from '@/lib/date'
 import type { SheetRow } from '@/lib/inventory'
 
 type Filter = 'recent' | 'all' | 'filled'
@@ -42,7 +42,7 @@ export function FulfillmentSheet({
       rows.map((row) => {
         const qty = Number(values[row.productId] ?? '') || 0
         const { plan, shortage } = planAllocation(
-          row.lots.map((l) => ({ id: l.id, expiryDate: new Date(l.expiry), quantity: l.quantity })),
+          row.lots.map((l) => ({ id: l.id, expiryDate: dateOnly(l.expiry), quantity: l.quantity })),
           qty,
           ALLOCATION.FEFO
         )

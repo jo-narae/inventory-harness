@@ -1,0 +1,47 @@
+# 로컬에서 통과한 npm run verify가 깨끗한 환경에서도 재현되는지 확인한다.
+#
+# CI는 두 번째 심판이 아니다. 새로운 기준으로 다시 채점하지 않는다.
+# 같은 명령을, 아무것도 남아 있지 않은 곳에서 한 번 더 돌릴 뿐이다.
+# (docs/08-harness.md §7 · §11 · §13)
+
+name: verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    env:
+      # 로컬의 harness.db와 이름만 같을 뿐 서로 다른 파일이다.
+      # CI는 실행할 때마다 자기 것을 새로 만든다.
+      DATABASE_URL: "file:./prisma/harness.db"
+      HARNESS_DATABASE_URL: "file:./prisma/harness.db"
+      SESSION_SECRET: "ci-only-not-a-real-secret-value-32chars"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 보호 경로 검사가 main과 비교하므로 얕은 클론으로는 부족하다
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # PR에서는 base 브랜치를, push에서는 main을 기준으로 삼는다
+      - name: 보호 경로 기준 설정
+        run: |
+          BASE="${{ github.base_ref || 'main' }}"
+          git fetch --no-tags origin "$BASE"
+          echo "HARNESS_DIFF_BASE=origin/$BASE" >> "$GITHUB_ENV"
+          echo "HARNESS_BRANCH=${{ github.head_ref || github.ref_name }}" >> "$GITHUB_ENV"
+
+      # 로컬과 같은 심판. 테스트 DB 준비도 이 안에서 일어난다.
+      - run: npm run verify
