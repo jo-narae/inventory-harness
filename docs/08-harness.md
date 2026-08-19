@@ -666,7 +666,8 @@ NEEDS_HUMAN
 scripts/verify/**
 tests/**invariant**
 .github/workflows/**
-docs/00~08
+docs/01~08
+docs/harness/00-ssot.md
 기존 prisma/migrations/**
 
 ```
@@ -998,11 +999,12 @@ AI Review
 이번 실습에서는 결과뿐 아니라 AI가 유지보수 과정에서 어떻게 행동했는지도 기록한다.
 
 ```
-docs/09-harness-log.md
+docs/harness/01-log.md
 
 ```
 
-`docs/01~08`은 보호하지만 `docs/09-harness-log.md`는 실험 기록을 위해 수정할 수 있도록 한다.
+`docs/01~08`과 `docs/harness/00-ssot.md`는 보호하지만
+`docs/harness/01-log.md`는 실험 기록을 위해 수정할 수 있도록 한다.
 
 ---
 
@@ -1108,6 +1110,78 @@ PR 게이트
 
 ---
 
+## 22.1 산출물이 놓이는 자리
+
+H0~H5에서 만드는 것 중 **문서는 두 개뿐**이고, 나머지는 실제로 실행되는 코드·설정이다.
+
+| 단계 | 산출물 | 위치 | 성격 |
+|---|---|---|---|
+| H0 | SSOT 정책 | `docs/harness/00-ssot.md` | 문서 · **보호** |
+| H1 | verify 명령 | `package.json` | 설정 |
+| H1 | Architecture Check | `scripts/verify/arch.ts` | 코드 · **보호** |
+| H1 | 보호 경로 검사 | `scripts/verify/protected.ts` | 코드 · **보호** |
+| H1 | 테스트 DB 초기화 | `scripts/verify/reset-db.ts` | 코드 · **보호** |
+| H1 | CI | `.github/workflows/verify.yml` | 설정 · **보호** |
+| H2 | Issue 템플릿 | `.github/ISSUE_TEMPLATE/maintenance.yml` | 설정 |
+| H3 | 구현 루프 | `.claude/skills/harness-loop/` | 스킬 |
+| H4 | PR 게이트 | `.claude/skills/harness-ship/` | 스킬 |
+| H5 | 실험 로그 | `docs/harness/01-log.md` | 문서 · 수정 허용 |
+
+### 문서 배치
+
+```text
+docs/
+├── 01-requirements.md   ┐
+├── 02-personas.md       │
+├── 03-scenarios.md      │  기획 Phase 산출물
+├── 04-engagement.md     │  번호 = 만들어진 순서이자 읽는 순서
+├── 05-design.md         │
+├── 06-architecture.md   │
+├── 07-plan.md           │
+├── 08-harness.md        ┘  ← 하네스 "설계"는 여기 남는다
+├── HANDOVER.md
+└── harness/                 ← 하네스 "운영물"
+    ├── 00-ssot.md           기준 지도 · 보호
+    └── 01-log.md            실험 기록 · AI 수정 허용
+```
+
+번호 체계를 섞지 않는다.
+
+```text
+docs/ 루트의 번호   → 기획 Phase 순서 (01~08에서 끝)
+harness/ 안의 번호  → 하네스 문서 자체의 순서 (00부터 새로 시작)
+```
+
+하네스 운영물을 `docs/` 루트에 번호로 밀어 넣으면 `00`은 "가장 먼저 읽을 것"인데
+**실제로는 Phase 8에서 만들어지고**, `09`는 Phase 산출물이 아니라 실행 기록인데
+아홉 번째 기획 문서처럼 보인다. 번호 하나가 세 가지를 뜻하게 되므로 디렉터리로 가른다.
+
+### 왜 단계마다 문서를 만들지 않는가
+
+H1의 검사 규칙을 별도 문서로 또 적으면 같은 규칙이 두 곳에 존재하게 된다.
+문서와 `arch.ts`가 어긋나는 순간 **어느 쪽이 기준인지 다시 정해야 한다.**
+
+이 하네스가 하려는 것은 그 반대다.
+
+```text
+문서에 적힌 규칙
+      ↓
+실제로 검사되는 규칙
+```
+
+따라서 H1~H4에서는 **검사 코드 자체가 규칙의 원본**이고,
+`08-harness.md`는 그 코드가 왜 그렇게 생겼는지를 설명하는 정책 문서로 남는다.
+
+```text
+"규칙이 무엇인가"         → scripts/verify/
+"왜 그런 규칙인가"        → docs/08-harness.md
+"어떤 질문에 어디를 보나"  → docs/harness/00-ssot.md
+```
+
+문서를 줄이는 것이 목적이 아니라 **규칙이 두 벌 생기지 않게 하는 것**이 목적이다.
+
+---
+
 # 23. H0 — SSOT 정책 수립
 
 현재 프로젝트에는 역할이 다른 여러 문서가 존재한다.
@@ -1137,7 +1211,7 @@ GitHub Issue
 SSOT 정책 자체는 다음 파일에서 관리한다.
 
 ```text
-docs/00-ssot.md
+docs/harness/00-ssot.md
 ```
 
 예:
@@ -1277,7 +1351,7 @@ AI가 Issue를 해결하기 위해 SSOT를 임의로 수정하면 기준의 의�
 따라서 SSOT는 보호 대상으로 둔다.
 
 ```text
-docs/00-ssot.md
+docs/harness/00-ssot.md
 docs/01-requirements.md
 docs/06-architecture.md
 docs/08-harness.md
