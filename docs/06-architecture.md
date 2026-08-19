@@ -473,7 +473,7 @@ export async function allocateLots(tx, { productId, locationId, quantity, strate
 가리킨다 (F10, P12).
 
 **중복 취소 금지**: 하나의 원본 Movement에는 상쇄 Movement를 한 번만
-허용한다. `cancelMovement()`는 같은 `reversalOfId`를 가진 기록이 이미
+허용한다. `reverseMovement()`는 같은 `reversalOfId`를 가진 기록이 이미
 있는지 트랜잭션 안에서 확인하고, 있으면 취소를 거부한다.
 
 가능하면 Prisma 관계도 명시한다.
@@ -530,7 +530,7 @@ PoC에서는 애플리케이션 레벨 검증으로 충분하지만, 상용화 �
     도메인 로직                              ← FEFO 조회·정산 계산도 같은 tx 사용
        ├─ allocateFefo(tx)
        ├─ settlePopup(tx)
-       └─ cancelMovement(tx)
+       └─ reverseMovement(tx)
        ↓
     applyMovement(tx) × N                  ← Lot 갱신 + Movement 기록을 원자적으로
        ↓
@@ -617,7 +617,7 @@ Domain Logic
   ├─ allocateFefo(tx)
   ├─ applyMovement(tx)
   ├─ settlePopup(tx)
-  └─ cancelMovement(tx)
+  └─ reverseMovement(tx)
         ↓
 Prisma ORM
         ↓
