@@ -132,6 +132,20 @@ PR 생성
 
 # 3. Issue = 유지보수 계약서
 
+두 단어를 구분해서 쓴다.
+
+```text
+Issue 템플릿     .github/ISSUE_TEMPLATE/maintenance.yml
+                 빈 서식. H2에서 한 번 만들고 계속 재사용한다.
+
+유지보수 계약서   템플릿을 채워서 연 개별 Issue
+                 작업마다 사람이 쓴다. 이것이 그 작업의 SSOT다.
+```
+
+H2가 만드는 것은 **템플릿**이고, **계약서**는 실제 Issue를 열 때 생긴다.
+
+서식이 있다고 계약이 성립하지는 않는다. 종료 조건을 사람이 채워 넣어야 계약이 된다.
+
 Issue에는 최소한 두 가지가 필요하다.
 
 ```
@@ -1158,7 +1172,7 @@ CI Failure Cause: 테스트 DB 초기화 과정 누락
 |---|---|---|
 | H0 | SSOT 정책 수립 | 기준 문서 정의, 문서 역할·충돌·변경 규칙 |
 | H1 | 공통 심판 기반 구축 | `npm run verify`, Architecture Check, 보호 경로 검사, 테스트 DB 준비 과정, GitHub Actions |
-| H2 | 계약서 | 유지보수 Issue Template + Issue별 테스트 명명 규칙 |
+| H2 | Issue 템플릿 | 유지보수 Issue Template + Issue별 테스트 명명 규칙 |
 | H3 | 구현 루프 | Issue → SSOT 확인 → 종료 조건 기계화 → 구현 → verify → 재시도 |
 | H4 | PR 게이트 | PR → 독립 CI 재검증 → AI Review → 사람 승인 |
 | H5 | 실전 검증 | 실제 유지보수 Issue 투입 + 실험 로그 |
@@ -1182,7 +1196,7 @@ SSOT 정책
 ↓
 검증 체계
 ↓
-Issue 계약
+Issue 템플릿
 ↓
 구현 루프
 ↓
@@ -1518,7 +1532,7 @@ npm run verify
 
 ---
 
-# 25. H2 — Issue 계약
+# 25. H2 — Issue 템플릿
 
 주요 산출물:
 
