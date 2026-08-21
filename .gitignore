@@ -54,9 +54,9 @@ src/generated
 # typescript
 *.tsbuildinfo
 
-# Next.js 가 자동 생성하는 에이전트 규칙 파일 (이 프로젝트에서는 쓰지 않음)
-AGENTS.md
-CLAUDE.md
+# AGENTS.md · CLAUDE.md 는 하네스 진입점이므로 추적한다.
+# AGENTS.md 상단 BEGIN/END 블록은 next dev 가 다시 써넣는다. 그 블록만 자동 생성물이고,
+# 아래에 붙인 하네스 진입 규칙은 사람이 관리한다.
 
 # 작업 산출물
 .playwright-mcp/
