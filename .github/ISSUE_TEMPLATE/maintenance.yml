@@ -1,0 +1,102 @@
+name: 유지보수 작업
+description: AI 유지보수 하네스가 처리할 작업. 이 Issue가 해당 작업의 SSOT다.
+title: "[유지보수] "
+labels: ["maintenance"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        이 서식을 채우면 **유지보수 계약서**가 된다. AI는 여기 적힌 종료 조건만을 완료 기준으로 삼는다.
+
+  - type: textarea
+    id: background
+    attributes:
+      label: 배경
+      description: 왜 이 작업이 필요한가?
+      placeholder: |
+        유통기한이 지난 로트가 가용 재고에 계속 잡혀 실사 수량과 어긋난다.
+    validations:
+      required: true
+
+  - type: textarea
+    id: changes
+    attributes:
+      label: 변경할 내용
+      description: 무엇을 수정하거나 추가해야 하는가?
+      placeholder: |
+        - /expiry 화면 추가 (만료·임박 로트 조회)
+        - 만료 로트 폐기 기능 추가
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        **종료 조건은 실행해서 참·거짓을 확인할 수 있게 쓴다.** 기준일·수치·기대 결과를 문장 안에 넣는다.
+
+        되는 예
+        - 만료 로트 6개 폐기 시 자사창고(OWN) 수량 -6, 폐기 거점(DISPOSAL) 수량 +6이 된다.
+        - 폐기 전후 모든 거점의 Lot.quantity 합계가 동일하다 (폐기 거점 포함).
+        - 폐기가 만든 Movement의 type이 DISPOSE이고 reason이 DISPOSE다.
+
+        안 되는 예
+        - 폐기 기능이 정상적으로 동작한다. → 누가 "정상"을 판정하나
+        - 조회 함수가 대상 로트를 정확히 반환한다. → 입력도 기대값도 없다
+        - Movement의 reason이 비어 있지 않다. → 아무 문자열이나 넣으면 통과한다
+
+  - type: textarea
+    id: exit_criteria
+    attributes:
+      label: 종료 조건
+      description: 이 목록이 완료의 유일한 기준이다. 기계로 판정 가능한 항목은 아래 기능명으로 만들어질 테스트 파일에 구현된다.
+      value: |
+        - [ ] 
+        - [ ] 
+        - [ ] 
+    validations:
+      required: true
+
+  - type: input
+    id: feature_slug
+    attributes:
+      label: 기능명 (테스트 파일명에 쓸 slug)
+      description: |
+        이 Issue의 기계 검증 테스트는 `tests/issues/issue-{Issue 번호}-{기능명}.test.ts` 에 만든다.
+        영문 소문자와 하이픈만 쓴다. 예: `dispose` → `tests/issues/issue-23-dispose.test.ts`
+      placeholder: dispose
+    validations:
+      required: true
+
+  - type: textarea
+    id: do_not_touch
+    attributes:
+      label: 건드리면 안 되는 것
+      description: |
+        보호 경로(`scripts/verify/`, `.github/workflows/`, SSOT 문서, 불변식 테스트)는 이미 기계가 막는다.
+        이 작업에서만 추가로 손대면 안 되는 영역이 있으면 적는다.
+      placeholder: |
+        - 기존 입출고 화면의 FEFO 정렬 로직
+    validations:
+      required: false
+
+  - type: dropdown
+    id: max_loops
+    attributes:
+      label: 구현 루프 최대 횟수
+      description: 이 횟수 안에 `npm run verify`를 통과하지 못하면 AI는 실패를 선언하고 사람에게 넘긴다.
+      options:
+        - "1"
+        - "2"
+        - "3"
+        - "5"
+      default: 2
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: contract
+    attributes:
+      label: 계약 확인
+      options:
+        - label: 종료 조건을 실행해서 참·거짓을 판정할 수 있는 형태로 작성했다.
+          required: true
