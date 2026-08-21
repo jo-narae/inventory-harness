@@ -2,7 +2,7 @@
  * 보호 경로 검사 — AI가 심판과 기준을 고치지 못하게 막는다.
  *
  * "고치지 마"라는 지시만으로는 부족하다. 실제 Git 변경 내역으로 판정한다.
- * (docs/08-harness.md §14~15, docs/harness/00-ssot.md §5)
+ * (docs/harness/00-ssot.md 5절 「보호 대상」, docs/harness/03-verify.md 6절 「심판 자신을 지키는 검사」)
  *
  * 판정 기준선은 main이다. main 자체에서는 검사하지 않는다 —
  * 기준을 세우는 것은 사람의 일이고, 그 작업은 main에서 일어난다.
@@ -23,8 +23,9 @@ if (branch === 'main' || branch === 'HEAD') {
 const PROTECTED = [
   { pattern: /^docs\/01-requirements\.md$/,   why: '제품 요구사항 SSOT' },
   { pattern: /^docs\/06-architecture\.md$/,   why: '아키텍처 SSOT' },
-  { pattern: /^docs\/08-harness\.md$/,        why: '하네스 정책 SSOT' },
-  { pattern: /^docs\/harness\/00-ssot\.md$/,  why: 'SSOT 정책' },
+  { pattern: /^docs\/08-harness\.md$/,        why: '하네스 배경·원칙' },
+  // docs/harness/** 는 하네스 정책 SSOT. 실험 기록(06-log.md)만 예외로 쓰기 허용
+  { pattern: /^docs\/harness\/(?!06-log\.md$).+$/, why: '하네스 정책 SSOT' },
   { pattern: /^scripts\/verify\//,            why: '심판 자신' },
   { pattern: /^\.github\/workflows\//,        why: 'CI 정의' },
   { pattern: /invariant.*\.test\.ts$/,        why: '불변식 테스트' },

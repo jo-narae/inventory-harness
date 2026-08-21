@@ -1,6 +1,6 @@
 # 00. SSOT 정책
 
-> H0 산출물 · 하네스 정책의 근거: [../08-harness.md](../08-harness.md) 23절  
+> 하네스의 배경과 원칙: [../08-harness.md](../08-harness.md) · 구축 순서: [01-build.md](01-build.md)
 > **보호 문서** — AI는 이 파일을 수정하지 않는다 (5절 참조)
 
 ---
@@ -9,13 +9,13 @@
 
 **어떤 질문에 어떤 원본을 봐야 하는지**를 정한다.
 
-모든 정보를 한 문서에 모으는 것이 목적이 아니다. 정보는 지금 있는 자리에 그대로 두고,  
+모든 정보를 한 문서에 모으는 것이 목적이 아니다. 정보는 지금 있는 자리에 그대로 두고,
 **영역마다 최종 판단 권한을 가진 문서 하나**를 지정한다.
 
 ```text
 "재고 감소에 사유를 꼭 붙여야 하나?"   → docs/01-requirements.md
 "폐기도 applyMovement를 거쳐야 하나?"  → docs/06-architecture.md
-"verify가 3번 실패하면 어떻게 하나?"   → docs/08-harness.md
+"verify가 3번 실패하면 어떻게 하나?"   → docs/harness/04-loop.md
 "이번에 무엇을 고쳐야 하나?"           → GitHub Issue
 ```
 
@@ -27,13 +27,33 @@
 | --- | --- | --- |
 | 제품 기능 · 도메인 규칙 | `docs/01-requirements.md` | 무엇을 만드는가. 로트의 정의, 사유 체계, FEFO/LEFO, 팝업 정산, 완료 기준 |
 | 기술 구조 · 아키텍처 불변식 | `docs/06-architecture.md` | 어떻게 만드는가. 데이터 모델, `applyMovement` 단일 통로, 트랜잭션 경계 |
-| 유지보수 하네스 정책 | `docs/08-harness.md` | 어떻게 검증하고 언제 멈추는가. verify 구성, 루프 상한, 보호 규칙, PR 게이트 |
+| 유지보수 하네스 정책 | `docs/harness/` | 어떻게 검증하고 언제 멈추는가 (아래 표) |
 | 개별 유지보수 작업 | **GitHub Issue** | 이번에 무엇을 바꾸고, 무엇이 참이면 완료인가 |
-| 검사 규칙의 실제 내용 | `scripts/verify/` | 실행되는 규칙 그 자체 (H1 이후) |
+| 검사 규칙의 실제 내용 | `scripts/verify/` | 실행되는 규칙 그 자체 |
 
-마지막 줄이 중요하다. **규칙의 원본은 그 규칙을 실행하는 코드**이고,  
-`08-harness.md`는 그 코드가 왜 그렇게 생겼는지를 설명하는 정책 문서다.  
-규칙 목록을 알고 싶으면 문서가 아니라 `scripts/verify/`를 읽는다.
+### 하네스 정책 안에서의 라우팅
+
+| 질문 | 원본 |
+| --- | --- |
+| 하네스를 어떤 순서로 짓나 · 무엇이 어디 놓이나 | [`01-build.md`](01-build.md) |
+| Issue에 무엇이 있어야 계약인가 · 종료 조건을 어떻게 쓰나 | [`02-contract.md`](02-contract.md) |
+| 무엇이 완료를 판정하나 · CI는 왜 또 도나 · 테스트 DB | [`03-verify.md`](03-verify.md) |
+| 몇 번까지 다시 시도하나 · PR · Review · 최종 상태 | [`04-loop.md`](04-loop.md) |
+| 무엇을 기록하고 무엇으로 재나 | [`05-experiment.md`](05-experiment.md) |
+| 실제 실행 기록 | [`06-log.md`](06-log.md) |
+| 왜 이런 하네스인가 (배경 · 원칙) | [`../08-harness.md`](../08-harness.md) |
+
+하네스 규칙에는 두 종류가 있고, 원본이 서로 다르다.
+
+| | 원본 | 예 |
+| --- | --- | --- |
+| **무엇을 판정하고 언제 멈추는가** | 위 표의 `docs/harness/` 문서 | SSOT 충돌 처리, 종료 조건의 요건, 구현 루프 상한, AI Review 처리, 사람 최종 승인, 성공 기준 |
+| **그 판정을 어떻게 실행하는가** | 코드 · 설정 | `package.json`의 verify 구성, `scripts/verify/arch.ts`의 검사 목록, `scripts/verify/protected.ts`의 보호 경로와 판정 기준, `scripts/verify/reset-db.ts`의 DB 준비 절차, `.github/workflows/verify.yml`의 CI 절차 |
+
+문서는 그 코드가 왜 그렇게 생겼는지를 설명하고, 코드는 실제로 실행되는 내용을 갖는다.
+같은 구분을 [03-verify.md](03-verify.md) 1절이 `verify`에 그대로 적용한다.
+
+**검사 규칙의 구체적인 목록**을 알고 싶으면 문서가 아니라 `scripts/verify/`를 읽는다.
 
 ---
 
@@ -49,9 +69,9 @@
 | `docs/05-design.md` | 화면·컴포넌트 명세 |
 | `docs/07-plan.md` | **최초 구현 당시의 계획.** 지나간 기록이다 |
 | `docs/HANDOVER.md` | 구현 중 정해진 것, 함정, 파일 지도 |
-| `docs/harness/01-log.md` | 하네스 실험 기록 |
+| `docs/harness/06-log.md` | 하네스 실험 기록 |
 
-`07-plan.md`을 특히 조심한다. M1~M7 진행 상황과 "구현 중 결정" 메모가 섞여 있어  
+`07-plan.md`을 특히 조심한다. M1~M7 진행 상황과 "구현 중 결정" 메모가 섞여 있어
 현재 상태처럼 읽히기 쉽지만, **제품 요구사항이나 현재 아키텍처를 바꾸지 못한다.**
 
 ---
@@ -83,7 +103,7 @@ Issue 조회 (gh issue view N)
 | 유통기한 · 폐기 | `01` F9 · `06` 4.1 |
 | 실사 · 수치 반영 | `01` F8 · `02` T5 (성격 차이) |
 | 화면 · 컴포넌트 | `05` (참고) — 동작 규칙은 `01` |
-| 하네스 자체의 동작·정책 | `08` |
+| 하네스 자체의 동작·정책 | `docs/harness/` (1절의 라우팅 표에서 해당 문서) |
 
 ---
 
@@ -101,7 +121,7 @@ Issue 조회 (gh issue view N)
 | --- | --- |
 | GitHub Issue ↔ `01-requirements.md` | 구현하지 않음 → `NEEDS_HUMAN` |
 | GitHub Issue ↔ `06-architecture.md` | 구현하지 않음 → `NEEDS_HUMAN` |
-| GitHub Issue ↔ `08-harness.md` | 구현하지 않음 → `NEEDS_HUMAN` |
+| GitHub Issue ↔ `docs/harness/` 정책 문서 | 구현하지 않음 → `NEEDS_HUMAN` |
 | `01-requirements.md` ↔ `06-architecture.md` | 어느 쪽도 우선하지 않음 → `NEEDS_HUMAN` |
 | `07-plan.md` ↔ `01` / `06` | `01` · `06` 우선. 충돌로 보지 않는다 |
 | 참고 문서(`02`~`05`, `HANDOVER`) ↔ `01` / `06` | `01` · `06` 우선 |
@@ -141,27 +161,31 @@ Issue가 더 최신이라는 이유만으로 SSOT를 이기지 못한다.
 
 ## 5. 보호 대상
 
-AI가 기준과 심판을 스스로 고치면 기준의 의미가 사라진다. 아래는 변경 금지다.
+AI가 기준과 심판을 스스로 고치면 기준의 의미가 사라진다.
+
+테스트가 실패했을 때 AI가 구현 코드를 고치는 대신 테스트 자체를 삭제하거나, `expect`를 완화하거나, Architecture Check에 예외를 추가해버릴 수 있다. 그 순간 심판은 심판이 아니게 된다.
+
+따라서 다음 성격의 파일은 변경 금지다.
 
 ```text
-docs/01-requirements.md
-docs/06-architecture.md
-docs/08-harness.md
-docs/harness/00-ssot.md      ← 이 문서
-
-scripts/verify/**
-tests/**invariant**
-.github/workflows/**
-기존 prisma/migrations/**
+기준 문서        제품 요구사항 · 아키텍처 · 하네스 정책 문서
+심판 자신        검사 스크립트 · 불변식 테스트 · CI 정의
+지나간 계약       과거 Issue의 종료 조건 테스트
+확정된 이력       기존 migration
 ```
 
 허용되는 것:
 
 ```text
-docs/harness/01-log.md                         실험 기록
-tests/issues/issue-{현재 번호}-*.test.ts        이번 Issue의 종료 조건
-새 migration                                    기존 migration 수정은 금지
+docs/harness/06-log.md                          실험 기록
+tests/issues/issue-{현재 번호}-*.test.ts         이번 Issue의 종료 조건
+새 migration                                     기존 migration 수정은 금지
 ```
+
+> **정확한 경로 목록과 판정 기준은 `scripts/verify/protected.ts`가 원본이다.**
+> 지시가 아니라 **Git 변경 내역으로 판정**하며, 위반 시 `verify`가 실패한다.
+> 기준선은 `main`이고, `main`에서는 검사하지 않는다 — 기준을 세우는 것은 사람의 일이다.
+> 판정 방식은 [03-verify.md](03-verify.md) 6절에 있다.
 
 ### Issue별 테스트는 자기 것만 쓴다
 
@@ -178,11 +202,7 @@ tests/issues/issue-23-*.test.ts   변경 금지   ← 지난 계약이 지키던
 막지 않으면 #24를 통과시키려고 #23의 조건을 느슨하게 만들 수 있고,
 그 순간 누적 회귀 방지가 무너진다.
 
-현재 Issue 번호는 **브랜치명에서 읽는다** (`23-expiry-dispose` → 23).
-
-> **이 목록의 실행 원본은 `scripts/verify/protected.ts`다.**
-> 지시가 아니라 **Git 변경 내역으로 판정**하며, 위반 시 `verify`가 실패한다.
-> 기준선은 `main`이고, `main`에서는 검사하지 않는다 — 기준을 세우는 것은 사람의 일이다.
+현재 Issue 번호를 어디서 읽는지는 [04-loop.md](04-loop.md) 1절에 있다.
 
 ---
 
@@ -211,7 +231,7 @@ SSOT를 고치는 것은 사람의 일이다. 사람이 갱신한 뒤에 그 기
 아래가 달라지면 사람이 이 문서를 갱신한다.
 
 - 새 SSOT 영역이 생겼을 때 (예: 배포 정책 문서 추가)
-- 보호 대상이 늘거나 줄었을 때
-- 문서 배치가 바뀌었을 때 (`../08-harness.md` 22.1과 함께 고친다)
+- 보호 대상의 **성격**이 늘거나 줄었을 때 (경로 목록 자체는 `protected.ts`가 원본이다)
+- 하네스 정책 문서가 추가·삭제되어 1절의 라우팅이 달라졌을 때
 
-갱신하면 `08-harness.md` 22.1의 산출물 표와 어긋나지 않는지 확인한다. 둘은 같은 배치를 말해야 한다.
+문서와 산출물이 **어디에 놓이는지**는 [01-build.md](01-build.md) 4절이 원본이다. 여기서 배치를 다시 정의하지 않는다.

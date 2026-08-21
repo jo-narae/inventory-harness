@@ -5,7 +5,8 @@
 | 질문 | 원본 |
 | --- | --- |
 | 기준은 어디에 있지? | `docs/harness/00-ssot.md` |
-| 하네스 규칙은? | `docs/08-harness.md` |
+| 하네스 규칙은? | `docs/harness/` (`00-ssot.md` 1절 라우팅 표) |
+| 하네스를 처음부터 다시 지으려면? | `docs/harness/01-build.md` |
 | 이번 작업은? | 해당 GitHub Issue (`gh issue view <번호>`) |
 | 검사는? | `scripts/verify/` |
 | 완료 판정은? | `npm run verify` — 실행 결과가 판단한다 |

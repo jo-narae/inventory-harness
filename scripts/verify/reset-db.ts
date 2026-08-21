@@ -5,7 +5,7 @@
  * 우연히 통과할 수 있다. 그래서 verify는 전용 DB를 매번 새로 만든다.
  *
  * 로컬과 CI는 같은 파일을 공유하지 않는다.
- * 같은 '방법'으로 각자 독립된 DB를 만들 뿐이다 (docs/08-harness.md §10).
+ * 같은 '방법'으로 각자 독립된 DB를 만들 뿐이다 (docs/harness/03-verify.md 5절).
  */
 import { existsSync, rmSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
