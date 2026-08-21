@@ -31,7 +31,7 @@
 입력   docs/**
        설계는 이미 존재한다. 다시 쓰지 않는다.
 
-출력   scripts/verify/**   .github/**   .claude/skills/**   tests/**
+출력   scripts/verify/**   .github/**   tests/**
        실제로 실행되는 것.
 ```
 
@@ -190,7 +190,8 @@ H3~ → 기계화 가능한 종료 조건을 테스트로 추가 → npm run ver
              이 목록에 없는 것은 읽지 않는다.
              목록 밖 정보가 필요하면 00-ssot.md 3절 「범위가 부족할 때」로 간다.
 
-만들 것      .claude/skills/harness-loop/    스킬
+만들 것      tests/issues/issue-{번호}-{기능명}.test.ts    코드
+             전달받은 Issue의 종료 조건 중 기계 판정 가능한 것 (04-loop.md 2절)
 
 하지 않을 것  PR 생성 · CI · Review. 그것은 H4다.
              개발용 Issue를 Merge하지 않는다.
@@ -244,8 +245,7 @@ H3~ → 기계화 가능한 종료 조건을 테스트로 추가 → npm run ver
 읽을 것      04-loop.md 4~8절    PR 생성 · CI 복귀 · AI Review · 사람 게이트 · 최종 상태
              03-verify.md 3절    CI가 왜 같은 명령을 다시 도는가
 
-만들 것      .claude/skills/harness-ship/    스킬
-             .github/workflows/verify.yml    H1 산출물을 PR 트리거로 연결
+만들 것      .github/workflows/verify.yml    H1 산출물을 PR 트리거로 연결
              GitHub branch protection        설정
 
 하지 않을 것  PR 이후 수정 루프의 상한값을 정하는 것.
@@ -299,8 +299,7 @@ H0~H5에서 만드는 것 중 **문서는 두 개뿐**이고, 나머지는 실�
 | H1 | CI | `.github/workflows/verify.yml` | 설정 |
 | H2 | Issue 템플릿 | `.github/ISSUE_TEMPLATE/maintenance.yml` | 설정 |
 | H3~ | Issue별 종료 조건 테스트 | `tests/issues/issue-{번호}-{기능명}.test.ts` | 코드 · Merge 후 회귀 테스트로 유지 |
-| H3 | 구현 루프 | `.claude/skills/harness-loop/` | 스킬 |
-| H4 | PR 게이트 | `.claude/skills/harness-ship/` | 스킬 |
+| H4 | PR 게이트 | `.github/workflows/verify.yml` · GitHub branch protection | 설정 |
 | H5 | 실험 로그 | `docs/harness/06-log.md` | 문서 · 수정 허용 |
 
 > **무엇이 보호 대상인지는 이 표가 아니라 `scripts/verify/protected.ts`가 판정한다.**
