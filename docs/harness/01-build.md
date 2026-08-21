@@ -1,4 +1,4 @@
-# 01. 구축 — H0~H5 재구축 청사진
+# 01. 구축 — H0~H4 재구축 청사진
 
 > **원본 범위** — 단계별 목표·착수 조건·읽을 문서(그 단계의 읽기 범위 상한)·산출물·완료 조건,
 > 산출물이 놓이는 자리
@@ -10,7 +10,7 @@
 
 ## 0. 이 문서의 역할
 
-**규칙을 적지 않는다.** 규칙의 원본은 `00`·`02`~`05`와 `scripts/verify/`에 있다.
+**규칙을 적지 않는다.** 규칙의 원본은 `00`·`02`~`04`와 `scripts/verify/`에 있다.
 
 이 문서는 네 가지만 답한다.
 
@@ -44,7 +44,7 @@ H0·H2의 문서·설정 산출물은
 
 ## 1. 두 개의 순서
 
-**구축 순서(H0~H5)와 문서 번호(00~06)는 다르다.**
+**구축 순서(H0~H4)와 문서 번호(00~04)는 다르다.**
 
 ```text
 문서 번호   유지보수 작업이 흐르는 순서로 매겼다
@@ -63,8 +63,8 @@ AI가 작업을 시작하기 전에 두 가지를 먼저 만든다.
 ```
 
 ```text
-SSOT 정책 → 검증 체계 → Issue 템플릿 → 구현 루프 → PR 게이트 → 실전 검증
-   H0          H1           H2            H3          H4          H5
+SSOT 정책 → 검증 체계 → Issue 템플릿 → 구현 루프 → PR 게이트
+   H0          H1           H2            H3          H4
 ```
 
 > **기준을 먼저 정하고, 그 기준을 지키는지 판정할 심판을 만든 뒤 AI를 투입한다.**
@@ -78,9 +78,8 @@ SSOT 정책 → 검증 체계 → Issue 템플릿 → 구현 루프 → PR 게�
 | H0 | SSOT 정책 수립 | `docs/08-harness.md` | `00-ssot.md`가 다섯 질문에 답한다 |
 | H1 | 공통 심판 기반 구축 | `03-verify.md` · `00-ssot.md` 5절 | `main`과 CI에서 `npm run verify` 통과 |
 | H2 | Issue 템플릿 | `02-contract.md` | 템플릿이 필수 항목·배치 규칙을 만족한다 |
-| H3 | 구현 루프 | [3절 H3](#h3--harness-loop) 「읽을 것」이 상한 | 개발용 Issue가 Local Verify PASS 또는 NEEDS_HUMAN으로 종료 |
-| H4 | PR 게이트 | `04-loop.md` 4~8절 | PASS한 개발용 Issue가 PR→CI→Review→사람 판단까지 통과 |
-| H5 | 실전 검증 | `05-experiment.md` | 측정용 Issue 최소 1건에서 전 흐름 재현 |
+| H3 | 구현 루프 | [3절 H3](#h3--harness-loop) 「읽을 것」이 상한 | Issue가 Local Verify PASS 또는 NEEDS_HUMAN으로 종료 |
+| H4 | PR 게이트 | `04-loop.md` 4~8절 | PASS한 Issue가 PR→CI→Review→사람 판단까지 통과 |
 
 ---
 
@@ -105,7 +104,7 @@ SSOT 정책 → 검증 체계 → Issue 템플릿 → 구현 루프 → PR 게�
              ④ 무엇을 보호하는가, 왜 보호하는가
              ⑤ 기준 자체를 바꿔야 하면 어떻게 하는가
 
-완료 후 변화  docs/harness/** 가 보호 대상이 된다 (06-log.md 제외)
+완료 후 변화  docs/harness/** 가 보호 대상이 된다
 ```
 
 현재 프로젝트에는 역할이 다른 여러 문서가 존재한다. 모든 정보를 하나로 합치기보다 **영역별로 어떤 문서가 기준인지 명확하게 정의한다.** 다섯 질문의 답은 `00-ssot.md` 자신이 원본이다.
@@ -175,11 +174,11 @@ H3~ → 기계화 가능한 종료 조건을 테스트로 추가 → npm run ver
 
 ```text
 착수 조건    H2 완료
-             + 사람이 개발용 Issue 번호 1건을 전달한다
+             + 사람이 Issue 번호 1건을 전달한다
                루프를 돌려볼 대상이 없으면 만든 것을 실행해 확인할 수 없다.
                어느 Issue를 쓸지는 사람이 고른다. AI는 Issue 목록을 조회하지 않는다 —
-               gh issue list를 쓰지 않고, 전달받은 번호로 gh issue view만 한다.
-               개발용인지 측정용인지도 사람이 판단해 전달한다.
+               gh issue list를 쓰지 않고, 전달받은 번호로 gh issue view한다.
+               인계 기록은 gh issue comment로 남긴다 (04-loop.md 3절).
 
 읽을 것      04-loop.md 1~3절    시작점 · 종료 조건 처리 · 구현 루프와 상한
              02-contract.md 2절  판정 가능성 검사의 기준
@@ -194,15 +193,15 @@ H3~ → 기계화 가능한 종료 조건을 테스트로 추가 → npm run ver
              전달받은 Issue의 종료 조건 중 기계 판정 가능한 것 (04-loop.md 2절)
 
 하지 않을 것  PR 생성 · CI · Review. 그것은 H4다.
-             개발용 Issue를 Merge하지 않는다.
+             이 Issue를 Merge하지 않는다.
 
-완료 조건    개발용 Issue 1건이 루프를 통과해
+완료 조건    Issue 1건이 루프를 통과해
              Local Verify PASS 또는 NEEDS_HUMAN으로 종료된다
 
 완료 후 변화  PASS와 NEEDS_HUMAN은 둘 다 H3의 정상 종료다.
              SSOT 충돌처럼 NEEDS_HUMAN이 올바른 결과인 경우도 있다.
              다만 H4는 PR 이후 경로를 확인해야 하므로
-             Local Verify PASS한 개발용 Issue가 따로 필요하다 (H4 착수 조건).
+             Local Verify PASS한 Issue가 따로 필요하다 (H4 착수 조건).
 ```
 
 이번 하네스에서 가장 중요한 자동 반복 구간이다. 루프가 수행할 순서는 다음과 같다.
@@ -232,15 +231,14 @@ H3~ → 기계화 가능한 종료 조건을 테스트로 추가 → npm run ver
 
 ```text
 착수 조건    H3 완료
-             + Local Verify PASS한 개발용 Issue 1건
+             + Local Verify PASS한 Issue 1건
 
                H3의 Issue가 PASS로 끝났다면 그 Issue를 그대로 이어받는다.
                새 Issue를 열지 않는다.
 
                H3의 Issue가 NEEDS_HUMAN으로 끝났다면 — 그것이 올바른 종료였더라도
-               PR 이후 경로를 확인할 대상이 없다. 별도의 개발용 Issue로
+               PR 이후 경로를 확인할 대상이 없다. 별도의 Issue로
                PASS 경로를 확보한 뒤 착수한다.
-               측정용 Issue는 사용하지 않는다 (05-experiment.md 1절).
 
 읽을 것      04-loop.md 4~8절    PR 생성 · CI 복귀 · AI Review · 사람 게이트 · 최종 상태
              03-verify.md 3절    CI가 왜 같은 명령을 다시 도는가
@@ -248,46 +246,20 @@ H3~ → 기계화 가능한 종료 조건을 테스트로 추가 → npm run ver
 만들 것      .github/workflows/verify.yml    H1 산출물을 PR 트리거로 연결
              GitHub branch protection        설정
 
-하지 않을 것  PR 이후 수정 루프의 상한값을 정하는 것.
-             값은 H5 관찰 결과로 정한다. 미정 상태로 진행한다.
-
-완료 조건    PASS한 개발용 Issue의 PR이
+완료 조건    PASS한 Issue의 PR이
              CI 재검증 → AI Review → 사람 판단까지 한 번 통과한다
              사람이 승인한 경우에만 Merge한다
 
-완료 후 변화  개발용 Issue의 종료 조건 테스트는 회귀 테스트로 남는다
-             단, H5 집계에서는 제외한다 (05-experiment.md 1절)
+완료 후 변화  Issue의 종료 조건 테스트는 회귀 테스트로 남는다
 ```
 
 CI는 로컬 DB를 가져다 사용하는 것이 아니다. **CI 실행 시 자신의 테스트 DB를 새로 만들고 같은 검증을 실행한다.**
 
 ---
 
-### H5 — 실제 유지보수 이슈
-
-```text
-착수 조건    H4 완료
-             + 하네스 개발에 사용하지 않은 측정용 Issue 확보
-
-읽을 것      05-experiment.md    개발용/측정용 구분 · 측정 후보 · 로그 항목 · 관찰 항목 · 성공 기준
-
-만들 것      docs/harness/06-log.md    실험 기록    문서 · AI 수정 허용
-             tests/issues/issue-{번호}-{기능명}.test.ts
-
-하지 않을 것  개발용 Issue를 집계에 포함하는 것
-
-완료 조건    측정용 Issue 최소 1건에서 05-experiment.md 5절의 흐름을 끝까지 재현
-             또는 상한 도달 후 NEEDS_HUMAN으로 정상 종료
-             + 실험 로그 기록
-
-완료 후 변화  04-loop.md 5절의 PR 이후 수정 루프 상한값을 관찰 결과로 결정할 수 있다
-```
-
----
-
 ## 4. 산출물이 놓이는 자리
 
-H0~H5에서 만드는 것 중 **문서는 두 개뿐**이고, 나머지는 실제로 실행되는 코드·설정이다.
+H0~H4에서 만드는 것 중 **문서는 하나뿐**이고, 나머지는 실제로 실행되는 코드·설정이다.
 
 | 단계 | 산출물 | 위치 | 성격 |
 |---|---|---|---|
@@ -300,7 +272,6 @@ H0~H5에서 만드는 것 중 **문서는 두 개뿐**이고, 나머지는 실�
 | H2 | Issue 템플릿 | `.github/ISSUE_TEMPLATE/maintenance.yml` | 설정 |
 | H3~ | Issue별 종료 조건 테스트 | `tests/issues/issue-{번호}-{기능명}.test.ts` | 코드 · Merge 후 회귀 테스트로 유지 |
 | H4 | PR 게이트 | `.github/workflows/verify.yml` · GitHub branch protection | 설정 |
-| H5 | 실험 로그 | `docs/harness/06-log.md` | 문서 · 수정 허용 |
 
 > **무엇이 보호 대상인지는 이 표가 아니라 `scripts/verify/protected.ts`가 판정한다.**
 
@@ -322,9 +293,7 @@ docs/
     ├── 01-build.md          구축 청사진 · 이 문서
     ├── 02-contract.md       계약 규칙
     ├── 03-verify.md         심판 정책
-    ├── 04-loop.md           루프 · 상태
-    ├── 05-experiment.md     측정 설계
-    └── 06-log.md            실험 기록 · AI 수정 허용
+    └── 04-loop.md           루프 · 상태
 ```
 
 번호 체계를 섞지 않는다.
@@ -367,11 +336,9 @@ H1  □ main에서 npm run verify 통과
     □ CI 새 환경에서 npm run verify 통과
 H2  □ 템플릿이 필수 6항목을 받는다
     □ 작성 지침이 배치 3규칙을 만족한다
-H3  □ 개발용 Issue 1건이 Local Verify PASS 또는 NEEDS_HUMAN으로 종료
-H4  □ PASS한 개발용 Issue가 PR → CI → AI Review → 사람 판단까지 통과
+H3  □ Issue 1건이 Local Verify PASS 또는 NEEDS_HUMAN으로 종료
+H4  □ PASS한 Issue가 PR → CI → AI Review → 사람 판단까지 통과
     □ 승인된 경우에만 Merge
-H5  □ 측정용 Issue 최소 1건에서 전 흐름 재현 또는 NEEDS_HUMAN 정상 종료
-    □ docs/harness/06-log.md 에 기록
 ```
 
 ---

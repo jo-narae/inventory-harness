@@ -83,7 +83,9 @@ body:
     id: max_loops
     attributes:
       label: 구현 루프 최대 횟수
-      description: 이 횟수 안에 `npm run verify`를 통과하지 못하면 AI는 실패를 선언하고 사람에게 넘긴다.
+      description: |
+        로컬 구현 루프와 PR 이후 CI 실패 수정 루프에 각각 적용된다. 두 횟수는 합산하지 않는다.
+        각 구간에서 이 횟수 안에 `npm run verify`를 통과하지 못하면 AI는 실패를 선언하고 사람에게 넘긴다.
       options:
         - "1"
         - "2"

@@ -24,8 +24,8 @@ const PROTECTED = [
   { pattern: /^docs\/01-requirements\.md$/,   why: '제품 요구사항 SSOT' },
   { pattern: /^docs\/06-architecture\.md$/,   why: '아키텍처 SSOT' },
   { pattern: /^docs\/08-harness\.md$/,        why: '하네스 배경·원칙' },
-  // docs/harness/** 는 하네스 정책 SSOT. 실험 기록(06-log.md)만 예외로 쓰기 허용
-  { pattern: /^docs\/harness\/(?!06-log\.md$).+$/, why: '하네스 정책 SSOT' },
+  // docs/harness/** 는 하네스 정책 SSOT
+  { pattern: /^docs\/harness\//,             why: '하네스 정책 SSOT' },
   { pattern: /^scripts\/verify\//,            why: '심판 자신' },
   { pattern: /^\.github\/workflows\//,        why: 'CI 정의' },
   { pattern: /invariant.*\.test\.ts$/,        why: '불변식 테스트' },
