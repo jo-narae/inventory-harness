@@ -57,8 +57,7 @@ export default async function ProductPage({
       </section>
       <p className="px-4 pt-1 text-[10.5px] leading-relaxed text-sub">
         출고 가능은 <b className="text-[#5b5570]">자사창고</b>에 있는 재고만, 가용 재고는{' '}
-        <b className="text-[#5b5570]">자사창고와 풀필먼트</b>를 더한 재고만 셉니다. 그 밖의
-        거점(팝업·배송 중 등)은 총 재고에만 들어갑니다
+        <b className="text-[#5b5570]">자사창고와 풀필먼트</b>를 더한 재고만 셉니다
       </p>
 
       <nav className="flex gap-1.5 px-4 pt-2">
