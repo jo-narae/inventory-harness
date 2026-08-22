@@ -34,7 +34,7 @@ export default async function ProductPage({
 
       <section className="flex items-end gap-5 px-4 pb-1 pt-4">
         <div>
-          <p className="text-[11.5px] text-sub">현재 출고 가능</p>
+          <p className="text-[11.5px] text-sub">자사창고 출고 가능</p>
           <p className="text-[40px] font-extrabold leading-tight tracking-[-0.035em] text-acc tnum">
             {shippable}
             <span className="ml-1 text-[13px] font-bold text-sub">{product.unit}</span>
@@ -55,18 +55,11 @@ export default async function ProductPage({
           </p>
         </div>
       </section>
-      {available !== shippable && (
-        <p className="px-4 pt-1 text-[10.5px] leading-relaxed text-sub">
-          풀필먼트에 있는 <b className="tnum text-[#5b5570]">{available - shippable}</b>
-          {product.unit}는 가용 재고에는 들어가지만 지금 출고에는 쓸 수 없습니다
-        </p>
-      )}
-      {total !== available && (
-        <p className="px-4 pt-1 text-[10.5px] leading-relaxed text-sub">
-          배송 중·팝업에 있는 <b className="tnum text-[#5b5570]">{total - available}</b>
-          {product.unit}는 언제 빠질지 즉시 알 수 없어 가용 재고에서 빼고 총 재고에만 넣습니다
-        </p>
-      )}
+      <p className="px-4 pt-1 text-[10.5px] leading-relaxed text-sub">
+        출고 가능은 <b className="text-[#5b5570]">자사창고</b>에 있는 재고만, 가용 재고는{' '}
+        <b className="text-[#5b5570]">자사창고와 풀필먼트</b>를 더한 재고만 셉니다. 그 밖의
+        거점(팝업·배송 중 등)은 총 재고에만 들어갑니다
+      </p>
 
       <nav className="flex gap-1.5 px-4 pt-2">
         {[

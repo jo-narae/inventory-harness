@@ -14,7 +14,7 @@ export type StockRowData = {
   sku: string
   name: string
   unit: string
-  available: number // 지금 출고 가능 (배송 중·팝업 제외)
+  available: number // 가용 = 자사창고 + 풀필먼트 (AVAILABLE_LOCATION_TYPES)
   byLocation: { name: string; type: string; qty: number }[]
   excluded: { name: string; type: string; qty: number }[]
   headline: { expiryDate: Date; status: ExpiryStatus; days: number; locationName: string; qty: number } | null
