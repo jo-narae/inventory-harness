@@ -20,7 +20,7 @@ export default async function ProductPage({
   const data = await getProductDetail(Number(id))
   if (!data) notFound()
 
-  const { product, available, lotCards, locationCards, excluded } = data
+  const { product, total, shippable, lotCards, locationCards, excluded } = data
   const byLocation = view === 'location'
 
   return (
@@ -32,13 +32,29 @@ export default async function ProductPage({
         <span className="text-[11px] text-sub">{product.sku}</span>
       </header>
 
-      <section className="px-4 pb-1 pt-4">
-        <p className="text-[11.5px] text-sub">지금 출고 가능</p>
-        <p className="text-[40px] font-extrabold leading-tight tracking-[-0.035em] text-acc tnum">
-          {available}
-          <span className="ml-1 text-[13px] font-bold text-sub">{product.unit}</span>
-        </p>
+      <section className="flex items-end gap-6 px-4 pb-1 pt-4">
+        <div>
+          <p className="text-[11.5px] text-sub">현재 출고 가능</p>
+          <p className="text-[40px] font-extrabold leading-tight tracking-[-0.035em] text-acc tnum">
+            {shippable}
+            <span className="ml-1 text-[13px] font-bold text-sub">{product.unit}</span>
+          </p>
+        </div>
+        <div className="pb-[6px]">
+          <p className="text-[11.5px] text-sub">총 재고</p>
+          <p className="text-[22px] font-extrabold leading-tight tracking-[-0.02em] tnum">
+            {total}
+            <span className="ml-1 text-[11.5px] font-bold text-sub">{product.unit}</span>
+          </p>
+        </div>
       </section>
+      {total !== shippable && (
+        <p className="px-4 pt-1 text-[10.5px] leading-relaxed text-sub">
+          자사창고 밖(풀필먼트·배송 중·팝업)에 있는{' '}
+          <b className="tnum text-[#5b5570]">{total - shippable}</b>
+          {product.unit}는 지금 출고에 쓸 수 없어 총 재고에만 들어갑니다
+        </p>
+      )}
 
       <nav className="flex gap-1.5 px-4 pt-2">
         {[
