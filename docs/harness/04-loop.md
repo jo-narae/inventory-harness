@@ -27,13 +27,13 @@
 사람: 23번 이슈 처리해줘
 ```
 
-AI는 Issue 내용을 사람에게 다시 받지 않는다. 전달받은 번호로 GitHub CLI를 사용해 직접 조회한다.
+AI는 Issue 내용을 사람에게 다시 받지 않는다. 전달받은 번호로 직접 조회한다.
 
 ```bash
 gh issue view 23
 ```
 
-여기서 다음을 읽는다.
+여기서 다음을 읽는다 (필수 항목의 원본은 [02-contract.md](02-contract.md) 4절).
 
 ```text
 변경할 내용
@@ -42,21 +42,9 @@ gh issue view 23
 구현 루프 최대 횟수
 ```
 
-이렇게 하면 Issue가 개별 유지보수 작업의 단일 원본이 된다. 사람이 내용을 옮겨 적는 과정에서 종료 조건이 빠지거나 바뀌는 일이 생기지 않는다.
+사람이 옮겨 적는 과정에서 종료 조건이 빠지거나 바뀌지 않게 하기 위해서다.
 
-다만 Issue를 읽은 뒤 바로 구현하지 않는다. **먼저 해당 작업과 관련된 SSOT를 확인한다** — 절차와 충돌 처리는 [00-ssot.md](00-ssot.md) 3절·4절에 있다.
-
-```text
-Issue
-↓
-관련 SSOT 확인
-↓
-충돌 검사
-├─ 충돌 없음 → 계획 및 구현
-└─ 충돌 있음 → NEEDS_HUMAN
-```
-
-기준 자체가 충돌하는 문제는 구현 반복으로 해결하지 않고 사람에게 넘긴다.
+다만 Issue를 읽은 뒤 바로 구현하지 않는다. **먼저 해당 작업과 관련된 SSOT를 확인하고 충돌을 검사한다** — 절차와 충돌 처리는 [00-ssot.md](00-ssot.md) 3절·4절이 원본이다. 기준 자체가 충돌하는 문제는 구현 반복으로 해결하지 않고 `NEEDS_HUMAN`으로 넘긴다.
 
 ### 브랜치와 Issue 번호
 
@@ -308,15 +296,7 @@ PR 생성
 
 ### NEEDS_HUMAN에서는 PR을 만들지 않는다
 
-`verify`가 통과했더라도 결과가 `NEEDS_HUMAN`이면 PR을 만들지 않는다.
-
-```text
-NEEDS_HUMAN
-      ↓
-PR 없음
-      ↓
-Issue comment에 인계 기록  (3절)
-```
+`verify`가 통과했더라도 결과가 `NEEDS_HUMAN`이면 PR을 만들지 않는다. 남기는 것은 Issue comment의 인계 기록뿐이다 (3절).
 
 `verify` PASS는 **기계가 판정할 수 있는 것을 통과했다**는 뜻이지, 이 변경을 내보내도 좋다는 뜻이 아니다. 기준이 충돌했거나, 읽기 범위가 부족했거나, 고칠 것이 없어 보이는 상태는 코드로 답할 문제가 아니라 계약으로 답할 문제다.
 
@@ -341,42 +321,22 @@ PR이 생성되면 GitHub Actions가 독립된 환경에서 같은 `npm run veri
 CI에서 실패하면 원인을 분석하고, 자동으로 수정할 수 있다면 구현 단계로 돌아간다.
 
 ```text
+PR
+   ↓
 CI FAIL
    ↓
-원인 분석
+원인 분석 → 수정 → Local Verify PASS
    ↓
-수정
-   ↓
-Local Verify
-   ↓ PASS
 PR 업데이트
    ↓
-CI에서 새 환경 생성
+CI에서 새 환경 생성 → CI / Review 재확인
    ↓
-CI Verify 재실행
+반복
 ```
 
 ### PR 이후 CI 수정 루프에도 상한을 둔다
 
-CI 실패로 구현 단계에 복귀하는 횟수에도 상한을 둔다.
-
-```text
-PR
-↓
-CI 실패
-↓
-구현 단계로 복귀
-↓
-수정 + Local Verify
-↓
-PR 업데이트
-↓
-CI / Review 재확인
-↓
-반복
-```
-
-이 반복이 정해진 상한을 넘으면 더 이상 AI가 계속 수정하지 않고 `NEEDS_HUMAN`으로 넘긴다.
+CI 실패로 구현 단계에 복귀하는 횟수에도 상한을 둔다. 이 반복이 정해진 상한을 넘으면 더 이상 AI가 계속 수정하지 않고 `NEEDS_HUMAN`으로 넘긴다.
 
 > **상한값은 Issue의 「구현 루프 최대 횟수」와 같다** (3절).
 > 로컬 구현 루프와 합산하지 않고 이 구간에서 따로 센다.
@@ -417,18 +377,7 @@ Review AI 컨텍스트
 
 Review AI는 코드를 직접 수정하지 않고 **리뷰 결과만 남긴다.** 리뷰에서 문제가 발견되더라도 그 결과를 자동으로 구현 AI에게 넘겨 수정시키지 않는다.
 
-```text
-AI Review
-   ↓
-Review 결과
-   ↓
-[사람]
-PR 내용 + CI 결과 + Review 결과 확인
-   ↓
-승인 또는 수정 필요 판단
-```
-
-코드 리뷰는 종료 조건처럼 참·거짓으로만 판정되는 영역이 아니다. Review AI가 구조, 보안, 유지보수성 등의 문제를 제기하더라도 그 지적이 실제로 수정해야 할 사항인지, 현재 Issue의 범위에서 받아들여야 하는지는 사람이 판단한다.
+코드 리뷰는 종료 조건처럼 참·거짓으로 판정되는 영역이 아니다 ([02-contract.md](02-contract.md) 3절). Review AI가 구조·보안·유지보수성 문제를 제기하더라도, 그 지적이 실제로 수정해야 할 사항인지 그리고 **현재 Issue의 범위에서 받아들여야 하는지**는 7절에서 사람이 판단한다.
 
 ---
 
@@ -437,6 +386,8 @@ PR 내용 + CI 결과 + Review 결과 확인
 모든 자동 검증과 Review를 통과해도 자동으로 Merge하지 않는다.
 
 ```text
+PR 내용
++
 Local Verify PASS
 +
 CI Verify PASS
@@ -468,27 +419,7 @@ Merge
 Issue Close
 ```
 
-반대로 검증을 모두 통과했더라도 구현 방향이 Issue의 의도와 다르거나, Review 결과를 포함해 추가 수정이 필요하다고 판단되면 승인하지 않는다.
-
-```text
-사람 검토
- ↓
-반려
- ↓
-구현 단계로 복귀
- ↓
-수정
- ↓
-verify
- ↓
-PR 업데이트
- ↓
-CI
- ↓
-AI Review
- ↓
-사람 재검토
-```
+반대로 검증을 모두 통과했더라도 구현 방향이 Issue의 의도와 다르거나, Review 결과를 포함해 추가 수정이 필요하다고 판단되면 승인하지 않는다. 반려되면 5절과 같은 경로로 구현 단계에 복귀해 수정 → Local Verify → PR 업데이트 → CI → AI Review → 사람 재검토를 다시 거친다.
 
 이때 PR을 새로 생성하지 않는다. 기존 PR이 해당 브랜치를 계속 추적하므로 수정 후 같은 브랜치에 Push한다.
 
@@ -507,75 +438,29 @@ MERGED
 NEEDS_HUMAN
 ```
 
-`SSOT_CONFLICT`, `BLOCKED`, `VERIFY_FAIL`, `CI_FAIL` 등은 작업 도중 발생하는 이벤트다.
+`SSOT_CONFLICT`, `BLOCKED`, `VERIFY_FAIL`, `CI_FAIL` 등은 작업 도중 발생하는 이벤트이지 최종 상태가 아니다. `PROTECTED_PATH_CHANGE`로 `BLOCKED`된 작업의 최종 상태는 `NEEDS_HUMAN`이다 (이벤트 표기는 [03-verify.md](03-verify.md) 6절).
 
-```text
-Event: PROTECTED_PATH_CHANGE
-Result: BLOCKED
-
-Final State: NEEDS_HUMAN
-```
-
-전체 흐름은 다음과 같다.
+전체 상태 전이는 다음과 같다. 각 구간의 절차는 해당 절이 원본이다.
 
 ```text
 Issue
  ↓
-SSOT 확인
- ├─ 충돌 → NEEDS_HUMAN
- └─ 문제 없음
-        ↓
-Implementation Loop
- ├─ verify FAIL → 수정 → 재검증
- ├─ 구현 루프 상한 도달 → NEEDS_HUMAN
- └─ verify PASS
-        ↓
-       PR
-        ↓
-GitHub Actions
-독립 테스트 환경 준비
-        ↓
-   CI verify
-    ├─ FAIL → 구현 단계로 복귀
-    │          ↓
-    │       수정 + Local Verify
-    │          ↓
-    │       PR 업데이트
-    │          ↓
-    │       CI 재확인
-    │
-    └─ PASS
-         ↓
-     AI Review
-         ↓
-     Review 결과
-         ↓
-   사람 최종 판단
-   (PR 내용 + CI 결과 + Review 결과)
-    ├─ 수정 필요 → 구현 단계로 복귀
-    │               ↓
-    │            수정 + Local Verify
-    │               ↓
-    │            PR 업데이트
-    │               ↓
-    │            CI → AI Review → 사람 재검토
-    │
-    └─ 승인
-            ↓
-          MERGED
-            ↓
-        Issue Close
-
-PR 이후 CI 수정 루프
-→ 상한 도달
-→ NEEDS_HUMAN
-
-NEEDS_HUMAN
+SSOT 확인            ─ 충돌 → NEEDS_HUMAN              1절
  ↓
-[사람] 처분                                   → 아래
- ├─ 전제는 맞고 정보만 부족했다 → 정보 보완 → 구현 루프 재진입
- ├─ 전제 자체가 틀렸다         → PR 없이 Issue Close
- └─ 보류
+Implementation Loop  ─ 상한 도달 → NEEDS_HUMAN         3절
+ ↓ SUCCESS
+PR                                                    4절
+ ↓
+CI verify            ─ FAIL → 구현 단계 복귀
+                       └ 상한 도달 → NEEDS_HUMAN       5절
+ ↓ PASS
+AI Review                                             6절
+ ↓
+사람 최종 판단        ─ 반려 → 구현 단계 복귀           7절
+ ↓ 승인
+MERGED
+ ↓
+Issue Close
 ```
 
 즉 `NEEDS_HUMAN`으로 가는 경로는 두 군데다.
@@ -673,6 +558,20 @@ Issue Close (판단 근거를 comment에 남긴다)
 ```
 
 이때 남는 산출물은 Issue의 comment 기록뿐이다. 바꾼 코드가 없으므로 회귀 테스트로 남길 종료 조건도 없다 — 지키게 할 동작이 새로 생기지 않았기 때문이다.
+
+이번 실행에서 만든 종료 조건 테스트가 있다면 **함께 지운다.**
+
+```text
+지운다        tests/issues/issue-{현재 번호}-*.test.ts 중
+              이번 실행에서 새로 만들었고 아직 Merge되지 않은 것
+
+지우지 않는다  Merge되어 회귀 테스트로 남은 것
+              과거 Issue의 것은 애초에 쓰기 금지다 ([00-ssot.md](00-ssot.md) 5절)
+```
+
+전제가 틀렸다면 그 전제로 쓴 테스트도 틀렸다. 남겨두면 **잘못된 동작을 정답으로 고정하고**, 다음 작업은 그것을 지켜야 할 계약으로 읽는다.
+
+이 삭제는 Close 처분의 일부이므로 사람이 판단한다. **AI가 `verify`를 통과시키려고 테스트를 지우는 것과는 다르다** ([00-ssot.md](00-ssot.md) 5절) — 그쪽은 계약이 살아 있는데 심판을 치우는 것이고, 이쪽은 계약 자체가 성립하지 않았다고 사람이 판정한 경우다.
 
 닫는 이유는 사람이 남긴다. 나중에 같은 증상이 다시 보고됐을 때 **「그때 왜 고치지 않기로 했는가」**를 찾을 수 있어야 한다.
 
