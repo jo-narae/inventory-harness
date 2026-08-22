@@ -20,7 +20,7 @@ export default async function ProductPage({
   const data = await getProductDetail(Number(id))
   if (!data) notFound()
 
-  const { product, total, shippable, lotCards, locationCards, excluded } = data
+  const { product, total, available, shippable, lotCards, locationCards, excluded } = data
   const byLocation = view === 'location'
 
   return (
@@ -32,12 +32,19 @@ export default async function ProductPage({
         <span className="text-[11px] text-sub">{product.sku}</span>
       </header>
 
-      <section className="flex items-end gap-6 px-4 pb-1 pt-4">
+      <section className="flex items-end gap-5 px-4 pb-1 pt-4">
         <div>
           <p className="text-[11.5px] text-sub">현재 출고 가능</p>
           <p className="text-[40px] font-extrabold leading-tight tracking-[-0.035em] text-acc tnum">
             {shippable}
             <span className="ml-1 text-[13px] font-bold text-sub">{product.unit}</span>
+          </p>
+        </div>
+        <div className="pb-[6px]">
+          <p className="text-[11.5px] text-sub">가용 재고</p>
+          <p className="text-[22px] font-extrabold leading-tight tracking-[-0.02em] tnum">
+            {available}
+            <span className="ml-1 text-[11.5px] font-bold text-sub">{product.unit}</span>
           </p>
         </div>
         <div className="pb-[6px]">
@@ -48,11 +55,16 @@ export default async function ProductPage({
           </p>
         </div>
       </section>
-      {total !== shippable && (
+      {available !== shippable && (
         <p className="px-4 pt-1 text-[10.5px] leading-relaxed text-sub">
-          자사창고 밖(풀필먼트·배송 중·팝업)에 있는{' '}
-          <b className="tnum text-[#5b5570]">{total - shippable}</b>
-          {product.unit}는 지금 출고에 쓸 수 없어 총 재고에만 들어갑니다
+          풀필먼트에 있는 <b className="tnum text-[#5b5570]">{available - shippable}</b>
+          {product.unit}는 가용 재고에는 들어가지만 지금 출고에는 쓸 수 없습니다
+        </p>
+      )}
+      {total !== available && (
+        <p className="px-4 pt-1 text-[10.5px] leading-relaxed text-sub">
+          배송 중·팝업에 있는 <b className="tnum text-[#5b5570]">{total - available}</b>
+          {product.unit}는 언제 빠질지 즉시 알 수 없어 가용 재고에서 빼고 총 재고에만 넣습니다
         </p>
       )}
 
