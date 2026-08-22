@@ -14,7 +14,7 @@ export type StockRowData = {
   sku: string
   name: string
   unit: string
-  available: number // 지금 출고 가능 (배송 중·팝업 제외)
+  available: number // 가용 = 자사창고 + 풀필먼트 (AVAILABLE_LOCATION_TYPES)
   byLocation: { name: string; type: string; qty: number }[]
   excluded: { name: string; type: string; qty: number }[]
   headline: { expiryDate: Date; status: ExpiryStatus; days: number; locationName: string; qty: number } | null
@@ -180,6 +180,13 @@ export async function getProductDetail(productId: number) {
     .filter((l) => (SHIPPABLE_LOCATION_TYPES as string[]).includes(l.location.type))
     .reduce((s, l) => s + l.quantity, 0)
 
+  // 가용 재고 = 자사창고 + 풀필먼트 (AVAILABLE_LOCATION_TYPES).
+  // 팝업은 오프라인 판매라 언제 얼마가 빠질지 즉시 알 수 없고, 배송 중은 아직 어느 쪽도 세지 않는다.
+  // 지금 뺄 수 있는 양(shippable)은 아니지만 운영이 굴릴 수 있는 재고는 여기까지다.
+  const available = product.lots
+    .filter((l) => (AVAILABLE_LOCATION_TYPES as string[]).includes(l.location.type))
+    .reduce((s, l) => s + l.quantity, 0)
+
   // 유통기한별로 묶되, 안에 거점별 수량을 반드시 나열한다
   const byExpiry = new Map<
     number,
@@ -238,7 +245,7 @@ export async function getProductDetail(productId: number) {
       expiryDate: l.expiryDate,
     }))
 
-  return { product, total, shippable, lotCards, locationCards, excluded }
+  return { product, total, available, shippable, lotCards, locationCards, excluded }
 }
 
 // ───────────────────────── 풀필먼트 일일 반영 (S5)

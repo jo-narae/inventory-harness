@@ -21,7 +21,14 @@ export const LOCATION_TYPE_LABEL: Record<LocationType, string> = {
   DISPOSAL: '폐기',
 }
 
-/** 가용 재고(지금 출고 가능)에 포함되는 거점 유형 */
+/**
+ * 가용 재고 — 우리가 굴릴 수 있는 재고의 거점 유형.
+ *
+ * 지금 이 자리에서 뺄 수 있는 양(SHIPPABLE_LOCATION_TYPES)과는 다른 숫자다.
+ * 풀필먼트 재고는 지금 이쪽 출고에 쓸 수 없지만 우리 재고로 계획에 넣는다.
+ * 팝업은 오프라인 판매라 언제 얼마가 빠질지 즉시 알 수 없고, 배송 중은
+ * 도착 전이라 어느 쪽도 세지 않는다 (01 F6) — 둘 다 여기서 뺀다.
+ */
 export const AVAILABLE_LOCATION_TYPES: LocationType[] = [
   LOCATION_TYPES.OWN,
   LOCATION_TYPES.FULFILLMENT,
