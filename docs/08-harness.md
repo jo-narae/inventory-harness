@@ -68,7 +68,8 @@ Issue 분석 → 구현 → npm run verify
 [사람]
 PR 내용 + CI 결과 + Review 결과 확인
         ↓
-최종 승인 또는 수정 지시 → Merge → Issue Close
+├─ 승인 → Merge → Issue Close
+└─ 반려 → 사유를 Issue comment에 기록 → 구현 단계로 복귀
 ```
 
 각 단계의 규칙은 [`04-loop.md`](harness/04-loop.md)가 원본이다.
@@ -153,13 +154,13 @@ GitHub Actions가 새로운 테스트 DB를 만든다.
         ↓
 AI가 코드를 Review한다.
         ↓
-사람이 PR 내용과 Review 결과를 확인하고
-수정이 필요하다고 판단하면
-제한된 횟수만 구현 단계로 돌아간다.
+사람이 PR 내용과 Review 결과를 보고
+실제 의도와 맞는지 마지막으로 확인한다.
         ↓
-상한을 넘으면 NEEDS_HUMAN으로 종료한다.
+반려하면 사유를 Issue comment에 남기고
+그 사유를 입력으로 구현 단계로 돌아간다.
         ↓
-사람이 마지막으로 실제 의도를 확인한다.
+같은 PR을 그대로 쓰고, 다시 여기까지 온다.
         ↓
 승인하면 Merge하고 Issue를 종료한다.
 ```
