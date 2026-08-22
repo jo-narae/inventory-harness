@@ -1,7 +1,12 @@
 import { db } from './db'
 import { addDays, dateOnly, daysUntil, today } from './date'
 import { expiryStatus, type ExpiryStatus } from './expiry'
-import { AVAILABLE_LOCATION_TYPES, LOCATION_TYPES, TRANSIT_DELAY_DAYS } from './constants'
+import {
+  AVAILABLE_LOCATION_TYPES,
+  LOCATION_TYPES,
+  SHIPPABLE_LOCATION_TYPES,
+  TRANSIT_DELAY_DAYS,
+} from './constants'
 
 /** 재고 목록 한 줄에 필요한 것 (05-design 4.4) */
 export type StockRowData = {
@@ -167,8 +172,12 @@ export async function getProductDetail(productId: number) {
   })
   if (!product) return null
 
-  const available = product.lots
-    .filter((l) => (AVAILABLE_LOCATION_TYPES as string[]).includes(l.location.type))
+  // 총 재고 = 모든 거점의 합계. 지금 뺄 수 있는 양과는 다른 숫자다.
+  const total = product.lots.reduce((s, l) => s + l.quantity, 0)
+
+  // 현재 출고 가능 = 지금 이 자리에서 실제로 뺄 수 있는 재고만 (SHIPPABLE_LOCATION_TYPES)
+  const shippable = product.lots
+    .filter((l) => (SHIPPABLE_LOCATION_TYPES as string[]).includes(l.location.type))
     .reduce((s, l) => s + l.quantity, 0)
 
   // 유통기한별로 묶되, 안에 거점별 수량을 반드시 나열한다
@@ -229,7 +238,7 @@ export async function getProductDetail(productId: number) {
       expiryDate: l.expiryDate,
     }))
 
-  return { product, available, lotCards, locationCards, excluded }
+  return { product, total, shippable, lotCards, locationCards, excluded }
 }
 
 // ───────────────────────── 풀필먼트 일일 반영 (S5)

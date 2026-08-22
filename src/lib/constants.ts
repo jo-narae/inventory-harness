@@ -27,6 +27,15 @@ export const AVAILABLE_LOCATION_TYPES: LocationType[] = [
   LOCATION_TYPES.FULFILLMENT,
 ]
 
+/**
+ * 현재 출고에 실제로 쓸 수 있는 재고의 거점 유형.
+ *
+ * 풀필먼트로 이미 나간 재고는 남이 세는 곳에 있어 지금 이쪽에서 뺄 수 없고,
+ * 배송 중·팝업·폐기도 마찬가지다. 배분은 한 거점 안에서만 일어나므로
+ * (06 §4.2) 여러 거점의 수량을 더한 값은 '지금 뺄 수 있는 양'이 아니다.
+ */
+export const SHIPPABLE_LOCATION_TYPES: LocationType[] = [LOCATION_TYPES.OWN]
+
 // ───────── 이동 유형
 export const MOVEMENT_TYPES = {
   INBOUND: 'INBOUND', // 외부 → 내부
