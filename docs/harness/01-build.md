@@ -178,7 +178,7 @@ H3~ → 기계화 가능한 종료 조건을 테스트로 추가 → npm run ver
                루프를 돌려볼 대상이 없으면 만든 것을 실행해 확인할 수 없다.
                어느 Issue를 쓸지는 사람이 고른다. AI는 Issue 목록을 조회하지 않는다 —
                gh issue list를 쓰지 않고, 전달받은 번호로 gh issue view한다.
-               인계 기록은 gh issue comment로 남긴다 (04-loop.md 3절).
+               인계 기록과 시도 기록은 gh issue comment로 남긴다 (04-loop.md 3절).
 
 읽을 것      04-loop.md 1~3절    시작점 · 종료 조건 처리 · 구현 루프와 상한
              02-contract.md 2절  판정 가능성 검사의 기준
