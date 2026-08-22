@@ -303,6 +303,8 @@ NEEDS_HUMAN
 PR 생성
 ```
 
+이 루프의 산출물은 언제나 작업 브랜치와 PR이다. main 직접 push는 이 루프의 경로가 아니다 ([00-ssot.md](00-ssot.md) 5절).
+
 ### NEEDS_HUMAN에서는 PR을 만들지 않는다
 
 `verify`가 통과했더라도 결과가 `NEEDS_HUMAN`이면 PR을 만들지 않는다. 남기는 것은 Issue comment의 인계 기록뿐이다 (3절).
